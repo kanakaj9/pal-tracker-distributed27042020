@@ -1,4 +1,4 @@
-name: Pal Tracker Distributed Pipeline #27042020
+name: Pal Tracker Distributed Pipeline
 
 on:
   push:
@@ -13,11 +13,10 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 11
-      - name: chmod permissions
-        run: chmod +x ./gradlew
+      - name: Startup test database instance
+        run: sudo service mysql start
       - name: Create test database
         run: |
-          sudo /etc/init.d/mysql start &&
           mysql -uroot -proot < databases/create_databases.sql
           ./gradlew testMigrate
       - name: Build with Gradle
@@ -170,8 +169,6 @@ jobs:
           echo "deb https://packages.cloudfoundry.org/debian stable main" | sudo tee /etc/apt/sources.list.d/cloudfoundry-cli.list
           sudo apt-get update
           sudo apt-get install cf-cli
-      - name: chmod permissions
-        run: chmod +x ./gradlew
       - name: Migate tracker-database
         run: |
           cf api "$CF_API_URL"
